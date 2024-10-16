@@ -2,8 +2,8 @@ cmake_minimum_required(VERSION 3.10)
 
 if(IDF_VERSION_MAJOR GREATER_EQUAL 4)
 
-    idf_component_register( SRCS_DIR src
-                            INCLUDE_DIRS include)
+    idf_component_register( SRCS "src/TLA25x8.c"
+                            INCLUDE_DIRS "include")
 
 else()
 
