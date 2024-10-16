@@ -82,7 +82,7 @@ uint8_t TLA25x8_SetADCScanMode(const TLA25x8* const device, const TLA25x8ScanMod
     reg &= ~TLA25x8_SEQ_MODE_MASK;
     reg |= ((uint8_t)mode << TLA25x8_SEQ_MODE_SHIFT);
     
-    err = TLA52x8_WriteRegister(device, TLA25x8_REG_SEQUENCE_CFG, &reg);
+    return TLA52x8_WriteRegister(device, TLA25x8_REG_SEQUENCE_CFG, &reg);
 }                                
 
 uint8_t TLA25x8SetADCAutoScanChannels(const TLA25x8* const device, const uint8_t channel_mask)
@@ -195,10 +195,8 @@ uint8_t TLA25x8_Read(const TLA25x8* const device, void* const buffer, const uint
         const TLA2528* const dev = &device->tla2528;
         return dev->hal.i2c_read(dev->address, buffer, length);
     }
-    else 
-    {
-        return 0xFF;
-    }
+    
+    return 0xff;
 }
 
 uint8_t TLA25x8_Write(const TLA25x8* const device, const void* const buffer, uint8_t length)
@@ -207,25 +205,27 @@ uint8_t TLA25x8_Write(const TLA25x8* const device, const void* const buffer, uin
     assert(buffer != NULL);
     assert(device->initialized);
 
+    uint8_t err = 0;
+
     if(device->id == TLA25x8_ID_TLA2518)
     {
         const TLA2518* const dev = &device->tla2518;
         if(dev->spi_select_chip != NULL)
             dev->spi_select_chip(true);
 
-        dev->hal.spi_write(buffer, length);
+        err = dev->hal.spi_write(buffer, length);
 
         if(dev->spi_select_chip != NULL)
             dev->spi_select_chip(false);
+
+        return err;
 
     }
     else if (device->id == TLA25x8_ID_TLA2528)
     {
         const TLA2528* const dev = &device->tla2528;
-        dev->hal.i2c_write(dev->address, buffer, length);
+        return dev->hal.i2c_write(dev->address, buffer, length);
     }
-    else 
-    {
-        return 0xFF;
-    }
+
+    return 0xff;
 }
