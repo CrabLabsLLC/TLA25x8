@@ -50,7 +50,7 @@ TLA25x8* TLA2518_Init(const TLA2518HAL* const hal,
 TLA25x8* TLA25x8_Configure(const TLA25x8* const device, const TLA25x8Config* const config);
 
 
-uint8_t TLA25x8_ReadGeneralConfig(const TLA25x8* const device, const bool)
+uint8_t TLA25x8_ReadGeneralConfig(const TLA25x8* const device, const bool);
 
 /**
  * @brief 
@@ -148,7 +148,7 @@ uint8_t TLA25x8SetADCChannel(const TLA25x8* const device, const uint8_t channel)
  * @param channel 
  * @return uint8_t 
  */
-uint8_t TLA25x8ReadADC(const TLA25x8* const device, const uint8_t* channel);
+uint8_t TLA25x8ReadADC(const TLA25x8* const device, const uint16_t* channel, const uint8_t num_readings);
 
 
 #endif
