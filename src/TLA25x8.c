@@ -10,6 +10,8 @@
  */
 
 #include "TLA25x8.h"
+#include "TLA25x8LowLevel.h"
+#include "TLA25x8Registers.h"
 
 #include <assert.h>
 #include <stdbool.h>
@@ -72,37 +74,40 @@ uint8_t TLA25x8_GetGPIOInputValue(const TLA25x8* const device, uint8_t* const va
 
 uint8_t TLA25x8_SetADCScanMode(const TLA25x8* const device, const TLA25x8ScanMode mode)
 {
-    uint8_t register;
-    uint8_t err = TLA25x8_ReadRegister(device, TLA25x8_REG_SEQUENCE_CFG, &register);
+    uint8_t reg;
+    uint8_t err = TLA25x8_ReadRegister(device, TLA25x8_REG_SEQUENCE_CFG, &reg);
     if(err)
         return err;
     
-    register |= 
+    reg &= ~TLA25x8_SEQ_MODE_MASK;
+    reg |= ((uint8_t)mode << TLA25x8_SEQ_MODE_SHIFT);
+    
+    err = TLA52x8_WriteRegister(device, TLA25x8_REG_SEQUENCE_CFG, &reg);
 }                                
 
 uint8_t TLA25x8SetADCAutoScanChannels(const TLA25x8* const device, const uint8_t channel_mask)
 {
-
+    return TLA25x8_WriteRegister(device, TLA25x8_REG_AUTO_SEQ_CH_SEL, channel_mask);
 }
 
 uint8_t TLA25x8StartADCAutoScan(const TLA25x8* const device)
 {
-
+    return TLA25x8_SetRegisterBits(device, TLA25x8_REG_SEQUENCE_CFG, TLA25x8_SEQ_START_MASK);
 }
 
 uint8_t TLA25x8StopADCAutoScan(const TLA25x8* const device)
 {
-    
+    return TLA25x8_ClearRegisterBits(device, TLA25x8_REG_SEQUENCE_CFG, TLA25x8_SEQ_START_MASK);
 }
 
 uint8_t TLA25x8SetADCChannel(const TLA25x8* const device, const uint8_t channel)
 {
-
+    return TLA25x8_WriteRegister(device, TLA25x8_REG_CHANNEL_SEL, (channel << TLA25x8_MANUAL_CHIPID_SHIFT) & TLA25x8_MANUAL_CHIPID_MASK);
 }
 
-uint8_t TLA25x8ReadADC(const TLA25x8* const device, const uint8_t* channel)
+uint8_t TLA25x8ReadADC(const TLA25x8* const device, const uint16_t* reading, const uint8_t num_readings)
 {
-
+    return TLA25x8_Read(device, reading, 2 * num_readings);
 }
 
 uint8_t TLA25x8_WriteRegister(const TLA25x8* const device, const TLA25x8Register reg, const uint8_t value)
