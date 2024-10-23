@@ -30,6 +30,9 @@
 
 /// General Config Register (GENERAL_CFG)
 
+#define TLA25x8_CNVST_SHIFT         (0x2)
+#define TLA25x8_CNVST_MASK          (0x1 << TLA25x8_CNVST_SHIFT)
+
 #define TLA25x8_CH_RST_SHIFT        (0x2)
 #define TLA25x8_CH_RST_MASK         (0x1 << TLA25x8_CH_RST_SHIFT)
 
@@ -86,7 +89,7 @@ typedef enum tla25x8_reg_e
     TLA25x8_REG_GENERAL_CFG     = 0x01,
     TLA25x8_REG_DATA_CFG        = 0x02,
     TLA25x8_REG_OSR_CONFIG      = 0x03,
-    TLS25x8_REG_OPMODE_CONFIG   = 0x04,
+    TLA25x8_REG_OPMODE_CONFIG   = 0x04,
     TLA25x8_REG_PIN_CFG         = 0x05,
     TLA25x8_REG_GPIO_CONFIG     = 0x07,
     TLA25x8_REG_GPIO_DRIVE_CFG  = 0x09,

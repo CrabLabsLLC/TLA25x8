@@ -16,7 +16,7 @@
 #include <assert.h>
 #include <stdbool.h>
 #include <stddef.h>
-#include <strings.h>
+#include <string.h>
 
 TLA25x8* TLA2528_Init(const TLA2528HAL* const hal, const uint8_t address, TLA25x8* const device)
 {
@@ -47,6 +47,40 @@ TLA25x8* TLA2518_Init(const TLA2518HAL* const hal,
     return device;
 }
 
+uint8_t TLA25x8_Configure(const TLA25x8* const device, const TLA25x8Config* const config)
+{
+    const uint8_t opmode_reg =      (((uint8_t)config->base_clock_speed << TLA25x8_OSC_SEL_SHIFT) & TLA25x8_OSC_SEL_MASK) |
+                                    (((uint8_t)config->clock_divider << TLA25x8_CLK_DIV_SHIFT) & TLA25x8_CLK_DIV_MASK);
+    const uint8_t osr_cfg_reg =     ((uint8_t)config->oversampling << TLA25x8_OSC_SEL_SHIFT) & TLA25x8_OSC_SEL_MASK;
+
+    const uint8_t data_cfg_reg =    ((uint8_t)config->append_channel_to_data << TLA25x8_APPEND_STATUS_SHIFT) & TLA25x8_APPEND_STATUS_MASK;
+
+    const uint8_t sequence_cfg_reg = ((uint8_t)config->scan_mode << TLA25x8_SEQ_MODE_SHIFT) & TLA25x8_SEQ_MODE_MASK;
+    
+    uint8_t err = 0;
+
+    err = TLA25x8_WriteRegister(device, TLA25x8_REG_OPMODE_CONFIG, opmode_reg);
+    if (err) return err;
+
+    err =TLA25x8_SetPinConfiguration(device, config->gpio_enable_mask);
+    if (err) return err;
+
+    err = TLA25x8_SetGPIODirection(device, config->gpio_output_mask);
+    if (err) return err;
+
+    err = TLA25x8_WriteRegister(device, TLA25x8_REG_OSR_CONFIG, osr_cfg_reg);
+    if (err) return err;
+
+    err = TLA25x8_WriteRegister(device, TLA25x8_REG_DATA_CFG, data_cfg_reg);
+    if (err) return err;
+
+    err = TLA25x8_WriteRegister(device, TLA25x8_REG_AUTO_SEQ_CH_SEL, config->auto_scan_channel_mask);
+    if (err) return err;
+    
+    return TLA25x8_WriteRegister(device, TLA25x8_REG_SEQUENCE_CFG, sequence_cfg_reg);
+
+}
+
 uint8_t TLA25x8_SetPinConfiguration(const TLA25x8* const device, const uint8_t gpio_mask)
 {
     return TLA25x8_WriteRegister(device, TLA25x8_REG_PIN_CFG, gpio_mask);
@@ -54,7 +88,7 @@ uint8_t TLA25x8_SetPinConfiguration(const TLA25x8* const device, const uint8_t g
 
 uint8_t TLA25x8_SetGPIODirection(const TLA25x8* const device, const uint8_t output_mask)
 {
-    return TLA25x8_Write(device, TLA25x8_REG_GPIO_CONFIG, output_mask);
+    return TLA25x8_WriteRegister(device, TLA25x8_REG_GPIO_CONFIG, output_mask);
 }
 
 uint8_t TLA25x8_SetGPIOOutputType(const TLA25x8* const device, const uint8_t push_pull_mask)
@@ -82,33 +116,44 @@ uint8_t TLA25x8_SetADCScanMode(const TLA25x8* const device, const TLA25x8ScanMod
     reg &= ~TLA25x8_SEQ_MODE_MASK;
     reg |= ((uint8_t)mode << TLA25x8_SEQ_MODE_SHIFT);
     
-    return TLA52x8_WriteRegister(device, TLA25x8_REG_SEQUENCE_CFG, &reg);
+    return TLA25x8_WriteRegister(device, TLA25x8_REG_SEQUENCE_CFG, reg);
 }                                
 
-uint8_t TLA25x8SetADCAutoScanChannels(const TLA25x8* const device, const uint8_t channel_mask)
+uint8_t TLA25x8_SetADCAutoScanChannels(const TLA25x8* const device, const uint8_t channel_mask)
 {
     return TLA25x8_WriteRegister(device, TLA25x8_REG_AUTO_SEQ_CH_SEL, channel_mask);
 }
 
-uint8_t TLA25x8StartADCAutoScan(const TLA25x8* const device)
+uint8_t TLA25x8_StartAutoSequence(const TLA25x8* const device)
 {
     return TLA25x8_SetRegisterBits(device, TLA25x8_REG_SEQUENCE_CFG, TLA25x8_SEQ_START_MASK);
 }
 
-uint8_t TLA25x8StopADCAutoScan(const TLA25x8* const device)
+uint8_t TLA25x8_StopAutoSequence(const TLA25x8* const device)
 {
     return TLA25x8_ClearRegisterBits(device, TLA25x8_REG_SEQUENCE_CFG, TLA25x8_SEQ_START_MASK);
 }
 
-uint8_t TLA25x8SetADCChannel(const TLA25x8* const device, const uint8_t channel)
+uint8_t TLA25x8_SetADCChannel(const TLA25x8* const device, const uint8_t channel)
 {
     return TLA25x8_WriteRegister(device, TLA25x8_REG_CHANNEL_SEL, (channel << TLA25x8_MANUAL_CHIPID_SHIFT) & TLA25x8_MANUAL_CHIPID_MASK);
 }
 
-uint8_t TLA25x8ReadADC(const TLA25x8* const device, const uint16_t* reading, const uint8_t num_readings)
+uint8_t TLA25x8_ReadADC(const TLA25x8* const device, uint16_t* const readings, const uint8_t num_readings)
 {
-    return TLA25x8_Read(device, reading, 2 * num_readings);
+    return TLA25x8_Read(device, readings, sizeof(uint16_t) * num_readings);
 }
+
+uint8_t TLA25x8_StartADC(const TLA25x8* const device)
+{
+    return TLA25x8_SetRegisterBits(device, TLA25x8_REG_GENERAL_CFG, TLA25x8_CNVST_MASK);
+}
+
+uint8_t TLA25x8_StopADC(const TLA25x8* const device)
+{
+    return TLA25x8_ClearRegisterBits(device, TLA25x8_REG_GENERAL_CFG, TLA25x8_CNVST_MASK);
+}
+
 
 uint8_t TLA25x8_WriteRegister(const TLA25x8* const device, const TLA25x8Register reg, const uint8_t value)
 {

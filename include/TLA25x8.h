@@ -47,10 +47,7 @@ TLA25x8* TLA2518_Init(const TLA2518HAL* const hal,
  * @param config 
  * @return TLA25x8* 
  */
-TLA25x8* TLA25x8_Configure(const TLA25x8* const device, const TLA25x8Config* const config);
-
-
-uint8_t TLA25x8_ReadGeneralConfig(const TLA25x8* const device, const bool);
+uint8_t TLA25x8_Configure(const TLA25x8* const device, const TLA25x8Config* const config);
 
 /**
  * @brief 
@@ -113,7 +110,7 @@ uint8_t TLA25x8_SetADCScanMode(const TLA25x8* const device, const TLA25x8ScanMod
  * @param channel_mask 
  * @return uint8_t 
  */
-uint8_t TLA25x8SetADCAutoScanChannels(const TLA25x8* const device, const uint8_t channel_mask);
+uint8_t TLA25x8_SetADCAutoScanChannels(const TLA25x8* const device, const uint8_t channel_mask);
 
 /**
  * @brief 
@@ -121,7 +118,7 @@ uint8_t TLA25x8SetADCAutoScanChannels(const TLA25x8* const device, const uint8_t
  * @param device 
  * @return uint8_t 
  */
-uint8_t TLA25x8StartADCAutoScan(const TLA25x8* const device);
+uint8_t TLA25x8_StartAutoSequence(const TLA25x8* const device);
 
 /**
  * @brief 
@@ -129,7 +126,7 @@ uint8_t TLA25x8StartADCAutoScan(const TLA25x8* const device);
  * @param device 
  * @return uint8_t 
  */
-uint8_t TLA25x8StopADCAutoScan(const TLA25x8* const device);
+uint8_t TLA25x8_StopAutoSequence(const TLA25x8* const device);
 
 /**
  * @brief Set the channel for the next manual conversion
@@ -138,7 +135,7 @@ uint8_t TLA25x8StopADCAutoScan(const TLA25x8* const device);
  * @param channel 
  * @return uint8_t 
  */
-uint8_t TLA25x8SetADCChannel(const TLA25x8* const device, const uint8_t channel);
+uint8_t TLA25x8_SetADCChannel(const TLA25x8* const device, const uint8_t channel);
 
 
 /**
@@ -148,7 +145,23 @@ uint8_t TLA25x8SetADCChannel(const TLA25x8* const device, const uint8_t channel)
  * @param channel 
  * @return uint8_t 
  */
-uint8_t TLA25x8ReadADC(const TLA25x8* const device, const uint16_t* channel, const uint8_t num_readings);
+uint8_t TLA25x8_ReadADC(const TLA25x8* const device, uint16_t* const readings, const uint8_t num_readings);
+
+/**
+ * @brief 
+ * 
+ * @param device 
+ * @return uint8_t 
+ */
+uint8_t TLA25x8_StartADC(const TLA25x8* const device);
+
+/**
+ * @brief 
+ * 
+ * @param device 
+ * @return uint8_t 
+ */
+uint8_t TLA25x8_StopADC(const TLA25x8* const device);
 
 
 #endif

@@ -203,6 +203,9 @@ typedef struct tla25x8_config_t
     bool calibrate;
     bool append_channel_to_data;
 
+    TLA25x8ScanMode scan_mode;
+    uint8_t auto_scan_channel_mask;
+
     uint8_t gpio_enable_mask;
     uint8_t gpio_output_mask;
     uint8_t gpio_output_open_drain_mask;
