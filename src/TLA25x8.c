@@ -51,7 +51,7 @@ uint8_t TLA25x8_Configure(const TLA25x8* const device, const TLA25x8Config* cons
 {
     const uint8_t opmode_reg =      (((uint8_t)config->base_clock_speed << TLA25x8_OSC_SEL_SHIFT) & TLA25x8_OSC_SEL_MASK) |
                                     (((uint8_t)config->clock_divider << TLA25x8_CLK_DIV_SHIFT) & TLA25x8_CLK_DIV_MASK);
-    const uint8_t osr_cfg_reg =     ((uint8_t)config->oversampling << TLA25x8_OSC_SEL_SHIFT) & TLA25x8_OSC_SEL_MASK;
+    const uint8_t osr_cfg_reg =     ((uint8_t)config->oversampling << TLA25x8_OSR_SHIFT) & TLA25x8_OSR_MASK;
 
     const uint8_t data_cfg_reg =    ((uint8_t)config->append_channel_to_data << TLA25x8_APPEND_STATUS_SHIFT) & TLA25x8_APPEND_STATUS_MASK;
 
